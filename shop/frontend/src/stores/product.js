@@ -72,6 +72,7 @@ export const userProduct = defineStore("product", {
             this.filters = {};
             this.currentPage = 1;
             this.fetchData(this.currentPage);
+            window.location.reload();
         }
     },
     getters: {

@@ -4,8 +4,8 @@ from rest_framework import viewsets, pagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer
+from .models import Category, Product, Basket
+from .serializers import CategorySerializer, ProductSerializer, BasketSerializer
 
 
 # Create your views here.
@@ -14,11 +14,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AllowAny]
-
-    # def get_permissions(self):
-    #     if self.action in ['create', 'update', 'partial_update', 'destroy']:
-    #         return [IsAuthenticated()]  # Требует авторизации для создания и изменения
-    #     return [AllowAny()]
 
 
 class ProductPagination(pagination.PageNumberPagination):
@@ -61,3 +56,11 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Product.objects.filter(inStock=True)
+
+
+class BasketViewSet(viewsets.ModelViewSet):
+    serializer_class = BasketSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        return Basket.objects.filter(user=user_id)

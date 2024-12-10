@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 export const userRental = defineStore("rental", {
     state: () => ({
-        rentals: null,
+        rentals: 'Прокат сноубордов',
         listRentals: [
             'Прокат сноубордов',
             'Прокат тюбингов',

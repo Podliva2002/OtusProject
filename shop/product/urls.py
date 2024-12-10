@@ -14,9 +14,10 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from .views import CategoryViewSet, ProductViewSet
+from .views import CategoryViewSet, ProductViewSet, BasketViewSet
 
 app_name = 'shop_api'
 
@@ -34,7 +35,8 @@ router.register(
     basename='product'
 )
 
-urlpatterns = [
 
+urlpatterns = [
+    path('basket/<int:user_id>', BasketViewSet.as_view({'get': 'list'}), name='basket'),
     *router.urls,
 ]

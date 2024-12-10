@@ -2,8 +2,13 @@ import { createRouter, createWebHistory } from 'vue-router';
 import FirstPage from '../components/StartingPage.vue';
 import Washing from '../components/Washing.vue';
 import Rental from '../components/Rental.vue';
-import Catalog from '../components/Catalog.vue';
-import ProductDetail from '../components/ProductDetail.vue';
+import ProductDetail from '../components/Product/ProductDetail.vue';
+import Category from '../components/Product/Category.vue';
+import CategorySub from '../components/Product/CategorySub.vue';
+import newCatalog from '../components/Product/newCatalog.vue';
+import LastCategory from '../components/Product/LastCategory.vue';
+import LoginForm from '../components/UserProfile/LoginForm.vue';
+import Register from '../components/UserProfile/Register.vue';
 
 const routes = [
     { path: '/', component: FirstPage},
@@ -13,13 +18,21 @@ const routes = [
         name: 'Rental',
         component: Rental
     },
-    { path: '/catalog', component: Catalog},
+    { path: '/category', component: Category},
+    { path: '/category/:id', name: 'CategorySub', component: CategorySub },
+    { path: '/category/:id/:lastId', name: 'CategorySubLastId', component: LastCategory},
     { 
         path: '/productDetail/:id', 
         name: 'ProductDetail',
         component: ProductDetail 
     },
-
+    { 
+        path: '/newCatalog/:idCategory',
+        name: 'NewCatalog',
+        component: newCatalog,
+    },
+    { path: '/login', component: LoginForm },
+    { path: '/register', component: Register },
 ]
 
 const router = createRouter({

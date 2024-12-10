@@ -1,13 +1,5 @@
 <template>
     <div class="filters">
-        <select v-model="filter.category" class="selector">
-        <option value="">Выбрать категорию</option>
-        <optgroup v-for="cat in product.category" :key="cat.id" :label="cat.name">
-            <option v-for="subc in cat.subcategories" :key="subc.id" :value="subc.id">
-                {{ subc.name }}
-            </option>
-        </optgroup>
-    </select>
         <input type="number" v-model="filter.min_price" placeholder="Минимальная цена" class="search-input">
         <input type="number" v-model="filter.max_price" placeholder="Максимальная цена" class="search-input">
 
@@ -30,32 +22,46 @@
             <button @click="changePage(product.currentPage + 1)" :disabled="product.currentPage === product.totalPages">Вперед</button>
     </div>
 
+    <!-- ----------------------------------------------------------------
+    <div class="list-group" v-for="cat in product.category">
+        {{ cat.name }}
+    </div> -->
+
+    
+
 </template>
 
 <script>
-import { userProduct } from '../stores/product';
+import { userProduct } from '../../stores/product';
 import { onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default {
     setup() {
+        
         const product = userProduct();
+        const route = useRoute();
         const filter = {
-            category: '', // Изменяем поле на category
+            category: route.params.idCategory,
             min_price: null, //
-            max_price: null, // Изменяем поле на max_price
+            max_price: null,
         };
         
         const changePage = (page) => {
             product.setPage(page);
         };
-
-        onMounted(() => {
-            product.fetchData(product.currentPage);
-            product.fetchCategories();
-        });
         const applyFilters = () => {
             product.setFilters(filter);
         };
+
+        onMounted(() => {
+            product.fetchData(product.currentPage).then(() => {
+                applyFilters();
+            });
+            product.fetchCategories();
+            console.log(filter);
+        });
+        
 
         return {
             product,
@@ -98,8 +104,8 @@ body {
 }
 
 .product-image {
-    width: 100%;
-    height: 200px;
+    width: auto;
+    height: auto;
     object-fit: cover;
 }
 
@@ -177,6 +183,35 @@ body {
     color: #333;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
+}
+.dropMenu {
+    position: relative; /* Устанавливаем относительное позиционирование для родительского элемента */
+}
+
+.subMenu {
+    display: none; /* Скрываем подменю по умолчанию */
+    position: absolute; /* Устанавливаем абсолютное позиционирование для подменю */
+    top: 100%; /* Размещаем подменю под родительским элементом */
+    left: 0; /* Выравниваем по левому краю */
+    background-color: white; /* Устанавливаем белый фон для подменю */
+    border: 1px solid #ccc; /* Добавляем границу */
+    z-index: 1000; /* Устанавливаем z-index, чтобы подменю было поверх других элементов */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Добавляем тень для подменю */
+}
+
+.dropMenu:hover .subMenu {
+    display: block; /* Показываем подменю при наведении на родительский элемент */
+}
+
+.subMenu a {
+    display: block; /* Делаем ссылки блочными для удобства клика */
+    padding: 10px; /* Добавляем отступы для ссылок */
+    color: #000; /* Устанавливаем черный цвет текста */
+    text-decoration: none; /* Убираем подчеркивание */
+}
+
+.subMenu a:hover {
+    background-color: #f0f0f0; /* Меняем фон ссылки при наведении */
 }
 </style>
 

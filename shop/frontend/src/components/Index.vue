@@ -7,15 +7,20 @@ cd <template>
                 </router-link>
             </div>
             
-            <div class="login">
-                <a href="#">Login/Register</a>
-            </div>
+            <RouterLink to="/login">
+        <template v-if="user.isLoggedIn">
+            <img class="home" src="https://www.svgrepo.com/show/535711/user.svg" alt="User Icon" />
+        </template>
+        <template v-else>
+            Вход/Регистрация
+        </template>
+    </RouterLink>
         </div>
         <div class="navigation">
             <nav class="navigate">
                 <div class="menu">
                     <ul>
-                        <li><router-link to="/catalog">Каталог</router-link></li>
+                        <li><router-link to="/category">Каталог</router-link></li>
                         <li><a href="#">Мастерская</a></li>
                         <div class="dropMenu">
                             <li class="addContent">
@@ -24,14 +29,19 @@ cd <template>
                                     <router-link v-for="(a, index) in rental.listRentals" :key="index" :to="'/rental/' + a" @click="rental.changeRental(a)">
                                         {{ a }}
                                     </router-link>
-
                                 </div>
                             </li>
                         </div>
+                        
+
                         <li>
                             <router-link to="/washing" active-class="active">Веломойка</router-link>
                         </li>
-                        <li><a href="#">Контакты</a></li>
+                        
+                        <li v-if="user.user.is_superuser">
+                        <a href="#" @click="goToAdmin">Панель администратора</a>
+                        </li>
+                        
                     </ul>
                 </div>
             </nav>
@@ -44,19 +54,31 @@ cd <template>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { onMounted } from 'vue';
 import { userRental } from '../stores/rental';
+import { RouterLink } from 'vue-router';
+import { userAccount } from '../stores/user';
 
 export default {
     name: 'Header',
 
     setup() {
         const rental = userRental()
+        const user = userAccount()
 
+        onMounted(() => { 
+            user.fetchCurrentUser();
+        });
         return {
             rental,
+            user
         }
+    },
+    methods: {
+    goToAdmin() {
+      window.location.href = 'http://localhost:8000/admin/';
     }
+  }
     
 
 }
@@ -85,8 +107,10 @@ export default {
 
 .navigate {
     margin-top: 10px; /* Отступ сверху для навигации */
+    margin-bottom: 30px;
     background-color: black; /* Устанавливаем черный фон */
     padding: 1px; /* Уменьшаем отступы сверху и снизу для навигации */
+    border-radius: 15px;
 }
 
 .navigate ul {
@@ -126,6 +150,10 @@ export default {
     border: 1px solid #ccc; /* Добавляем границу */
     z-index: 1000; /* Устанавливаем z-index, чтобы подменю было поверх других элементов */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Добавляем тень для подменю */
+    transition: display 0.3s ease; /* Применяем плавное скрытие и показ при переходе */
+    cursor: pointer; /* Устанавливаем курсор в виде стрелки для навигации */
+    font-size: 14px; /* Устанавливаем размер шрифта для ссылок */
+    white-space: nowrap; /* Ограничиваем текст до переноса на новую строку */
 }
 
 .dropMenu:hover .subMenu {
@@ -146,6 +174,12 @@ export default {
 .addContent::after {
     content: "▼";
     margin-right: 0.5em;
+}
+.home {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 5px;
 }
 
  
