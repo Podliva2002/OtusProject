@@ -17,7 +17,7 @@
   <script>
   import { onMounted } from 'vue';
   import { useRoute } from 'vue-router';
-  import { userProduct } from '../stores/product';
+  import { userProduct } from '../../stores/product';
   
   export default {
     setup() {

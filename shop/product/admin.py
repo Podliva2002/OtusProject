@@ -2,7 +2,7 @@ from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
-from .models import Category, Product
+from .models import Category, Product, Basket
 
 
 # Register your models here.
@@ -11,6 +11,12 @@ from .models import Category, Product
 class CategoryAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'parentId', 'level',
     list_display_links = 'id', 'name'
+    ordering = ('id',)
+
+@admin.register(Basket)
+class BasketAdmin(admin.ModelAdmin):
+    list_display = 'id', 'user', 'product', 'quantity'
+    list_display_links = ['id',]
     ordering = ('id',)
 
 

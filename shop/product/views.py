@@ -1,24 +1,24 @@
-from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.auth.models import User
 from django_filters import rest_framework as filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, pagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer
+from .models import Category, Product, Basket
+from .serializers import CategorySerializer, ProductSerializer, BasketSerializer
 
 
 # Create your views here.
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AllowAny]
-
-    # def get_permissions(self):
-    #     if self.action in ['create', 'update', 'partial_update', 'destroy']:
-    #         return [IsAuthenticated()]  # Требует авторизации для создания и изменения
-    #     return [AllowAny()]
+    queryset = (
+        Category.objects
+        .select_related('parentId')
+        .all()
+    )
 
 
 class ProductPagination(pagination.PageNumberPagination):
@@ -47,7 +47,11 @@ class ProductFilter(filters.FilterSet):
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = (
+        Product.objects
+        .prefetch_related('category')
+        .all()
+    )
     serializer_class = ProductSerializer
     pagination_class = ProductPagination
     permission_classes = [AllowAny]
@@ -61,3 +65,39 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Product.objects.filter(inStock=True)
+
+
+class BasketViewSet(viewsets.ModelViewSet):
+    serializer_class = BasketSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        return Basket.objects.filter(user=user_id)
+
+
+class BasketAllViewSet(viewsets.ModelViewSet):
+    serializer_class = BasketSerializer
+    queryset = (
+        Basket.objects
+        .select_related('user', 'product')
+        .all()
+    )
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        print(request.data)
+        user = request.data['user']
+        product_id = request.data['product']
+        quantity = int(request.data.get('quantity', 1))
+
+        product = Product.objects.get(id=product_id)
+        user = User.objects.get(id=user)
+
+        basket, created = Basket.objects.get_or_create(user=user, product=product)
+
+        if not created:
+            basket.quantity += quantity
+            basket.save(update_fields=['quantity'])
+
+        return Response(BasketSerializer(basket).data)

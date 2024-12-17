@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 export const userRental = defineStore("rental", {
     state: () => ({
-        rentals: null,
+        rentals: localStorage.getItem("rental") || 'Прокат сноубордов',
         listRentals: [
             'Прокат сноубордов',
             'Прокат тюбингов',
@@ -10,7 +10,8 @@ export const userRental = defineStore("rental", {
         ],
     }),
     actions: {
-        changeRental (rent) {
+        async changeRental (rent) {
+            localStorage.setItem("rental", rent);
             this.rentals = rent;
         }
     }

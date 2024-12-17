@@ -1,0 +1,14 @@
+{% extends "admin/base_site.html" %}
+
+{% block usertools %}
+    <div id="user-tools">
+        <a href="http://localhost:5173/">На сайт</a>
+         /
+        <a href="/admin/password_change/">Изменить пароль</a>
+         /
+        <form id="logout-form" method="post" action="/admin/logout/">
+            {% csrf_token %}  <!-- Добавьте этот тег для генерации CSRF-токена -->
+            <button type="submit">Выйти</button>
+        </form>
+    </div>
+{% endblock %}

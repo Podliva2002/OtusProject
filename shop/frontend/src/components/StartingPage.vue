@@ -1,43 +1,48 @@
 <template>
     <div class="slider">
-        <div class="slides">
+        <div class="slides" ref="slides">
             <div class="slide active">
-                <img src="C:\MyFolder\Shop\shop\frontend\src\assets\velo-prokat1.jpg" alt="Image 1">
+                <img src="@/assets/velo-prokat1.jpg" alt="Image 1">
             </div>
             <div class="slide">
-                <img src="C:\MyFolder\Shop\shop\frontend\src\assets\velomoika-2048x878.jpg" alt="Image 2">
+                <img src="@/assets/velomoika-2048x878.jpg" alt="Image 2">
             </div>
             <div class="slide">
-                <img src="C:\MyFolder\Shop\shop\frontend\src\assets\velozapchasti-768x288.jpg" alt="Image 3">
+                <img src="@/assets/velozapchasti-768x288.jpg" alt="Image 3">
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
+
+const slides = ref(null);
 let currentSlide = 0;
 
 function showSlide(index) {
-    const slides = document.querySelectorAll('.slide');
-    if (index >= slides.length) {
+    const slideElements = slides.value.children;
+    if (index >= slideElements.length) {
         currentSlide = 0;
     } else if (index < 0) {
-        currentSlide = slides.length - 1;
+        currentSlide = slideElements.length - 1;
     } else {
         currentSlide = index;
     }
 
     const offset = -currentSlide * 100;
-    document.querySelector('.slides').style.transform = `translateX(${offset}%)`;
+    slides.value.style.transform = `translateX(${offset}%)`;
 }
 
 function changeSlide(direction) {
     showSlide(currentSlide + direction);
 }
 
-setInterval(() => {
-    changeSlide(1);
-}, 5000);
+onMounted(() => {
+    setInterval(() => {
+        changeSlide(1);
+    }, 5000);
+});
 </script>
 
 <style scoped>
@@ -58,7 +63,9 @@ setInterval(() => {
 }
 
 img {
-    width: 100%; /* Изображение занимает всю ширину слайда */
-    display: block; /* Убираем пробелы под изображением */
+    width: 100%;
+    height: 532px;
+    object-fit: fill;
+    display: block;
 }
 </style>
