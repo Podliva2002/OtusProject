@@ -50,6 +50,7 @@ export default {
     name: 'RentalPage',
     setup() {
         const rental = userRental()
+        
         return {
             rental,
         };

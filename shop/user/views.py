@@ -1,10 +1,9 @@
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
-from rest_framework import viewsets, generics, status
+from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import UserSerializer, UserRegistrationSerializer
 
@@ -13,6 +12,19 @@ from .serializers import UserSerializer, UserRegistrationSerializer
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [AllowAny]
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if 'password' in request.data:
+            request.data['password'] = make_password(request.data['password'])
+
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
 
 
 class CurrentUserView(APIView):
@@ -34,6 +46,7 @@ class CurrentUserView(APIView):
 
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
@@ -42,7 +55,3 @@ class UserRegistrationView(APIView):
                 "message": "User registered successfully"
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    pass

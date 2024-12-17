@@ -7,8 +7,8 @@
         <a href="/admin/password_change/">Изменить пароль</a>
          /
         <form id="logout-form" method="post" action="/admin/logout/">
-            <input type="hidden" name="csrfmiddlewaretoken" value="cF9U206P3EG1Gbn2sIyCOkNUq8ESCG19ZocgfMdPy9pxclmfQ3eKsdD3TYVvoNuR">
-        <button type="submit">Выйти</button>
+            {% csrf_token %}  <!-- Добавьте этот тег для генерации CSRF-токена -->
+            <button type="submit">Выйти</button>
         </form>
     </div>
 {% endblock %}

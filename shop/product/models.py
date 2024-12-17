@@ -41,7 +41,7 @@ class Product(models.Model):
 class Basket(models.Model):
     user = models.ForeignKey(to=UserModel, on_delete=models.CASCADE, verbose_name='Пользователь')
     product = models.ForeignKey(to=Product, on_delete=models.CASCADE, verbose_name='Товар')
-    quantity = models.PositiveSmallIntegerField(verbose_name='Количество', default=0)
+    quantity = models.PositiveSmallIntegerField(verbose_name='Количество', default=1)
 
     def __str__(self):
         return f"Корзина пользователя {self.user.username}"

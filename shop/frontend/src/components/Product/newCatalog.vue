@@ -1,49 +1,45 @@
 <template>
-    <div class="filters">
-        <input type="number" v-model="filter.min_price" placeholder="Минимальная цена" class="search-input">
-        <input type="number" v-model="filter.max_price" placeholder="Максимальная цена" class="search-input">
+    <div class="filters" v-if="!loading">
+        <input type="number" v-model="product.filters.min_price" placeholder="Минимальная цена" class="search-input">
+        <input type="number" v-model="product.filters.max_price" placeholder="Максимальная цена" class="search-input">
 
         <div>
             <button @click="applyFilters">Применить</button>
             <button @click="product.clearFilters">Сбросить фильтры</button>
         </div>
     </div>
-    <div class="product-grid">
+    <div v-if="loading" class="loading-indicator">Загрузка...</div>
+    <div class="product-grid" v-if="!loading">
         <div class="product-card" v-for="a in product.products" :key="a.id">
             <img :src="a.image" class="product-image" alt="Изображение товара">
             <div class="product-title"><router-link :to="{ name: 'ProductDetail', params: { id: a.id } }">{{ a.name }}</router-link></div>
             <div class="product-price">Цена: {{ a.price }} руб.</div>
-            <button class="add-to-cart">Добавить в корзину</button>
+            <button class="add-to-cart" @click="addBasket(user.user.id, a.id)">Добавить в корзину</button>
+            <p v-if="product.message && !user.isLoggedIn" class="error-message">{{ product.message }}</p>
         </div>
     </div>
-    <div class="pagination">
-            <button @click="changePage(product.currentPage - 1)" :disabled="product.currentPage === 1">Назад</button>
-            <span>Страница {{ product.currentPage }}</span>
-            <button @click="changePage(product.currentPage + 1)" :disabled="product.currentPage === product.totalPages">Вперед</button>
+    <div class="pagination" v-if="!loading">
+        <button @click="changePage(product.currentPage - 1)" :disabled="product.currentPage === 1">Назад</button>
+        <span>Страница {{ product.currentPage }}</span>
+        <button @click="changePage(product.currentPage + 1)" :disabled="product.currentPage === product.totalPages">Вперед</button>
     </div>
-
-    <!-- ----------------------------------------------------------------
-    <div class="list-group" v-for="cat in product.category">
-        {{ cat.name }}
-    </div> -->
-
-    
-
 </template>
 
 <script>
 import { userProduct } from '../../stores/product';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-
+import { userAccount } from '../../stores/user';
 export default {
     setup() {
-        
         const product = userProduct();
         const route = useRoute();
-        const filter = {
+        const user = userAccount();
+        const loading = ref(true); // Состояние загрузки
+
+        product.filters = {
             category: route.params.idCategory,
-            min_price: null, //
+            min_price: null,
             max_price: null,
         };
         
@@ -51,23 +47,29 @@ export default {
             product.setPage(page);
         };
         const applyFilters = () => {
-            product.setFilters(filter);
+            product.setFilters(product.filters);
+        };
+        const addBasket = async (userId, productId) => {
+            await product.fetchAddBasket(userId, productId);
         };
 
-        onMounted(() => {
-            product.fetchData(product.currentPage).then(() => {
-                applyFilters();
-            });
-            product.fetchCategories();
-            console.log(filter);
+        onMounted(async () => {
+            loading.value = true;
+            await Promise.all([
+                applyFilters(),
+                product.fetchCategories(),
+                user.fetchCurrentUser()
+            ]);
+            loading.value = false;
         });
         
-
         return {
             product,
             changePage,
             applyFilters,
-            filter,
+            addBasket,
+            user,
+            loading,
         }
     }
 }
@@ -104,9 +106,9 @@ body {
 }
 
 .product-image {
-    width: auto;
-    height: auto;
-    object-fit: cover;
+    width: 300px;
+    height: 300px;
+    object-fit: contain;
 }
 
 .product-title {
@@ -212,6 +214,12 @@ body {
 
 .subMenu a:hover {
     background-color: #f0f0f0; /* Меняем фон ссылки при наведении */
+}
+
+.loading-indicator {
+    text-align: center;
+    font-size: 1.5em;
+    margin-top: 20px;
 }
 </style>
 

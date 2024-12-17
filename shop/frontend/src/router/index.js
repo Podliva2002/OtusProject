@@ -9,6 +9,8 @@ import newCatalog from '../components/Product/newCatalog.vue';
 import LastCategory from '../components/Product/LastCategory.vue';
 import LoginForm from '../components/UserProfile/LoginForm.vue';
 import Register from '../components/UserProfile/Register.vue';
+import Profile from '../components/UserProfile/Profile.vue';
+import Basket from '../components/UserProfile/Basket.vue';
 
 const routes = [
     { path: '/', component: FirstPage},
@@ -33,6 +35,14 @@ const routes = [
     },
     { path: '/login', component: LoginForm },
     { path: '/register', component: Register },
+    { 
+        path: '/profile',
+        component: Profile,
+        children: [
+            { path: '/', component: Profile},
+            { path: '/basket', component: Basket }
+        ]
+    },
 ]
 
 const router = createRouter({

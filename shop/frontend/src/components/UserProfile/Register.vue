@@ -68,7 +68,6 @@
         <RouterLink to="/login">Уже есть аккаунт? Войти</RouterLink>
       </div>
     </form>
-    <!-- <p v-if="user.message" class="error-message">{{ user.message }}</p> -->
   </div>
 </template>
 

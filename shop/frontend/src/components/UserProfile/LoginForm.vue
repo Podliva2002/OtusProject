@@ -1,5 +1,5 @@
 <template>
-    <div class="login">
+    <div class="login" v-if="!user.isLoggedIn">
     <h2 v-if="!user.isLoggedIn">Вход в систему</h2>
     <form v-if="!user.isLoggedIn" @submit.prevent="login" class="login-form">
       <div class="form-group">
@@ -22,14 +22,14 @@
           placeholder="Пароль"
         />
       </div>
+      <p v-if="user.message" class="error-message">{{ user.message }}</p>
       <button type="submit" class="submit-button">Войти</button>
       <div class="create-account">
         <RouterLink to="/register">Нет аккаунта? Зарегистрируйтесь</RouterLink>
       </div>
     </form>
-    <p v-if="user.message" class="error-message">{{ user.message }}</p>
-    <button class="submit-button" v-if="user.isLoggedIn" @click="user.logout()">Выйти</button>
   </div>
+  <div v-else>Вы уже вошли</div>
 </template>
 
 <script>

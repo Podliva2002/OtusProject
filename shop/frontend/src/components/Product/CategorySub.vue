@@ -25,6 +25,8 @@
       const product = userProduct();
       const route = useRoute();
       const category = route.params.id;
+      localStorage.setItem('currentPage', 1)
+      product.currentPage = 1;
   
       onMounted(async () => {
         product.fetchCategories();

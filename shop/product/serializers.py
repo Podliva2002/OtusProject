@@ -1,4 +1,4 @@
-from rest_framework import serializers, fields
+from rest_framework import serializers
 
 from .models import Category, Product, Basket
 
@@ -25,6 +25,12 @@ class CategoryHyperLinkSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'parentId', 'level',)
 
 
+class ProductHyperLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('id', 'name',)
+
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -37,6 +43,29 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class BasketSerializer(serializers.ModelSerializer):
+    total_sum = serializers.SerializerMethodField()
+    cost = serializers.SerializerMethodField()
+    product_name = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Basket
-        fields = ('id', 'product', 'quantity')
+        fields = ('id', 'user', 'image', 'product', 'product_name', 'quantity', 'cost', 'total_sum')
+
+    def get_total_sum(self, obj):
+        product = obj.product
+        price = product.price
+        return price * obj.quantity
+
+    def get_cost(self, obj):
+        product = obj.product
+        price = product.price
+        return price
+
+    def get_product_name(self, obj):
+        product = obj.product
+        return product.name
+
+    def get_image(self, obj):
+        product = obj.product
+        return f'http://localhost:8000{product.image.url}' if product.image else None

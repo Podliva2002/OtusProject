@@ -1,17 +1,29 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from rest_framework import serializers
+
+User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'last_name', 'first_name', 'email', 'password', 'is_superuser',)
+        fields = (
+            'id', 'username', 'last_name', 'first_name', 'email', 'password', 'is_superuser', 'get_all_permissions'
+        )
 
+    def patch(self, validated_data):
+        user = self.instance
+        user.last_name = validated_data.get('last_name', user.last_name)
+        user.first_name = validated_data.get('first_name', user.first_name)
+        user.email = validated_data.get('email', user.email)
+        password = validated_data.get('password')
 
-from rest_framework import serializers
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
+        if password:
+            user.set_password(password)
+        user.save()
+        return user
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):

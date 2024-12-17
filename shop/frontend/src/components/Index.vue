@@ -7,14 +7,12 @@ cd <template>
                 </router-link>
             </div>
             
-            <RouterLink to="/login">
-        <template v-if="user.isLoggedIn">
-            <img class="home" src="https://www.svgrepo.com/show/535711/user.svg" alt="User Icon" />
-        </template>
-        <template v-else>
-            Вход/Регистрация
-        </template>
-    </RouterLink>
+            <RouterLink to="/login" v-if="!user.isLoggedIn">     
+                    Вход/Регистрация
+            </RouterLink>
+            <RouterLink to="/profile" v-if="user.isLoggedIn">   
+                    <img class="home" src="https://www.svgrepo.com/show/535711/user.svg" alt="User Icon" />
+            </RouterLink>
         </div>
         <div class="navigation">
             <nav class="navigate">
@@ -56,8 +54,8 @@ cd <template>
 <script>
 import { onMounted } from 'vue';
 import { userRental } from '../stores/rental';
-import { RouterLink } from 'vue-router';
 import { userAccount } from '../stores/user';
+import { RouterLink } from 'vue-router';
 
 export default {
     name: 'Header',
