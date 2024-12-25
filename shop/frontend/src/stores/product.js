@@ -167,7 +167,7 @@ export const userProduct = defineStore("product", {
         },
         getBasketSum(state) {
             return state.addbasket.reduce((total, item) => {
-                return total + (item.total_sum || 0); // Add total_sum of each item
+                return total + (item.total_sum || 0);
             }, 0);
         },
     },
